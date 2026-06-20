@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: biblioteca_db
+    environment:
+      POSTGRES_DB: db_biblioteca
+      POSTGRES_USER: trabalho_menolli
+      POSTGRES_PASSWORD: senha_menolli
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - biblioteca-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: biblioteca_backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/app
+      - /app/.gradle
+      - /app/build
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=db_biblioteca
+      - DB_USER=trabalho_menolli
+      - DB_PASS=senha_menolli
+      - SPRING_DOCKER_COMPOSE_ENABLED=false
+    depends_on:
+      - db
+    networks:
+      - biblioteca-net
+
+volumes:
+  pgdata:
+
+networks:
+  biblioteca-net:
+    driver: bridge
