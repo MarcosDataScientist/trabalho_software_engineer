@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca - Home</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Inclui o header do fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container">
+        <div class="titulo">
+            <h2>Meus Livros</h2>
+            <div style="display: flex; gap: 12px;">
+                <button th:onclick="'location.href=\'' + @{/emprestar} + '\''">
+                    Emprestar Novo Livro
+                </button>
+            </div>
+        </div>
+
+        <div class="lista" id="lista-livros">
+            
+            <!-- Iterando sobre empréstimos do aluno -->
+            <div th:if="${aluno != null and !aluno.emprestimos.isEmpty()}">
+                <div th:each="emprestimo : ${aluno.emprestimos}" th:if="${emprestimo.dataDevolucao == null}" class="livro" th:id="'livro-' + ${emprestimo.id}">
+                    <div>
+                        <!-- Assumindo que ItemEmprestimo contém Livro, e Livro contém Titulo. Pegando o primeiro item para simplificar -->
+                        <h3 th:text="${!emprestimo.itens.isEmpty() ? emprestimo.itens[0].livro.titulo.titulo : 'Livro'}">Título</h3>
+                        <p th:text="'Data de Devolução: ' + ${#temporals.format(emprestimo.dataPrevista, 'dd/MM/yyyy')}">Autor</p>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <!-- Verificação de atraso fictícia -->
+                        <span th:if="${emprestimo.dataDevolucao == null}" style="background: rgba(59, 130, 246, 0.1); color: var(--accent-color);">
+                            Em Aberto
+                        </span>
+                        
+                        <form th:action="@{/api/emprestimos/devolver}" method="post" style="margin: 0;">
+                            <!-- Seria necessário mapear id do aluno e dos itens, usaremos JS para manter o mock por enquanto -->
+                            <button type="button" style="padding: 8px 16px; font-size: 14px;"
+                                th:onclick="devolverLivro([[${emprestimo.id}]], [[${aluno.matricula}]], [[${!emprestimo.itens.isEmpty() ? emprestimo.itens[0].livro.id : 0}]])">
+                                Devolver
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Caso não haja aluno logado ou não tenha empréstimos (Oculto via thymeleaf, mas deixamos o layout mockado tbm caso null) -->
+            <div th:if="${aluno == null or aluno.emprestimos.isEmpty()}" class="livro">
+                <div style="text-align: center; width: 100%;">
+                    <h3 style="color: var(--text-secondary);">Nenhum empréstimo ativo</h3>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div id="mensagem-vazia"
+             style="display: none; text-align: center; margin-top: 40px; padding: 40px; background: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-color);">
+            <h3 style="color: var(--text-secondary); margin-bottom: 8px;">Nenhum livro alugado</h3>
+            <p style="color: var(--text-muted);">Você não possui nenhum empréstimo ativo no momento.</p>
+        </div>
+
+    </main>
+
+    <script th:src="@{/js/script.js}"></script>
+</body>
+</html>

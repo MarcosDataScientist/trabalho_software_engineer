@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar - Biblioteca</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container">
+        <div class="titulo" style="justify-content: center; margin-bottom: 20px;">
+            <h2>Acessar Área do Aluno</h2>
+        </div>
+
+        <form class="form-container" id="form-login" th:action="@{/login}" method="post">
+            
+            <!-- Exibição de Erro caso a matrícula não exista -->
+            <div th:if="${error}" class="alert-error" 
+                 style="background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-weight: 500; text-align: center;">
+                ⚠️ <span th:text="${error}">Matrícula inválida</span>
+            </div>
+
+            <div class="form-group">
+                <label for="matricula">Matrícula (RA)</label>
+                <input type="number" id="matricula" name="matricula" required 
+                       placeholder="Digite seu RA (Ex: 10, 20, 30)">
+            </div>
+
+            <div class="form-group">
+                <label for="nome">Nome Completo</label>
+                <input type="text" id="nome" name="nome" required 
+                       placeholder="Digite seu nome completo">
+            </div>
+
+            <div class="form-actions" style="margin-top: 25px;">
+                <button type="submit">Entrar</button>
+            </div>
+            
+            <p style="margin-top: 24px; text-align: center; color: var(--text-secondary); font-size: 14px;">
+                Ainda não tem cadastro? 
+                <a th:href="@{/cadastro-aluno}" style="color: var(--accent-color); text-decoration: none; font-weight: 600; transition: var(--transition-smooth);"
+                   onmouseover="this.style.color='var(--accent-hover)'" onmouseout="this.style.color='var(--accent-color)'">
+                    Cadastre-se aqui
+                </a>
+            </p>
+        </form>
+    </main>
+
+    <script th:src="@{/js/script.js}"></script>
+</body>
+</html>

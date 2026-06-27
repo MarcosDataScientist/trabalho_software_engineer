@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil do Aluno - Biblioteca</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container">
+        <div class="titulo">
+            <h2>Perfil do Aluno</h2>
+            <button th:onclick="'location.href=\'' + @{/dashboard} + '\''">
+                Voltar
+            </button>
+        </div>
+
+        <div class="profile-card" th:if="${aluno != null}">
+            <div class="profile-avatar" th:text="${#strings.substring(aluno.nome, 0, 2).toUpperCase()}">
+                MI
+            </div>
+
+            <h3 class="profile-name" th:text="${aluno.nome}">Michel Iago</h3>
+            <p class="profile-role" th:text="'Matrícula: ' + ${aluno.matricula}">RA: 24107</p>
+
+            <div class="profile-details">
+                <div class="profile-detail-item">
+                    <span class="profile-detail-label">CPF</span>
+                    <span class="profile-detail-value" th:text="${aluno.cpf}">123.456.789-00</span>
+                </div>
+
+                <div class="profile-detail-item">
+                    <span class="profile-detail-label">Endereço</span>
+                    <span class="profile-detail-value" th:text="${aluno.endereco}">Rua Exemplo, 123</span>
+                </div>
+
+                <div class="profile-detail-item">
+                    <span class="profile-detail-label">Status da Conta</span>
+                    <span class="profile-detail-value" 
+                          th:style="${aluno.possuiPendenciasFinanceiras() ? 'color: #ef4444; background: rgba(239, 68, 68, 0.1);' : 'color: #10b981; background: rgba(16, 185, 129, 0.1);'} + ' padding: 2px 8px; border-radius: 12px; font-size: 13px;'"
+                          th:text="${aluno.possuiPendenciasFinanceiras() ? 'Com Débitos' : 'Regular / Ativo'}">
+                          Regular / Ativo
+                    </span>
+                </div>
+
+                <div class="profile-detail-item">
+                    <span class="profile-detail-label">Livros Emprestados</span>
+                    <span class="profile-detail-value" th:text="${aluno.emprestimos.size()} + ' livros'">3 livros</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-card" th:if="${aluno == null}">
+            <h3 class="profile-name">Aluno não encontrado</h3>
+            <p class="profile-role">Verifique se você está autenticado corretamente.</p>
+        </div>
+
+    </main>
+
+    <script th:src="@{/js/script.js}"></script>
+</body>
+</html>

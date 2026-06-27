@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+    <header class="topo" th:fragment="header">
+        <h1>Biblioteca</h1>
+
+        <div class="perfil">
+            <!-- Nome do Usuário com Dropdown -->
+            <div class="menu-header" th:if="${isLoginPage == null or !isLoginPage}">
+                <div style="cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 10px 0;"
+                    onclick="toggleUserDropdown(event)">
+                    <strong id="username-display" th:text="${aluno != null ? aluno.nome : 'Visitante'}">Michel</strong>
+                    <span style="font-size: 10px; color: var(--text-secondary); transition: transform 0.2s;"
+                        id="user-arrow">▼</span>
+                </div>
+                <div id="user-dropdown-menu" class="dropdown-content" style="right: auto; left: 0;">
+                    <a th:href="@{/perfil}" th:if="${aluno != null}"> Ver Perfil</a>
+                    <a th:href="@{/login}"> Trocar Usuário / Entrar</a>
+                </div>
+            </div>
+
+            <div class="creditos" id="display-creditos" th:if="${aluno != null}">
+                <span th:text="${aluno.possuiPendenciasFinanceiras() ? 'Possui Débitos' : 'Sem Débitos'}">Status</span>
+            </div>
+
+            <!-- Botão de Ações Rápidas (+) com Dropdown -->
+            <div class="menu-header">
+                <button class="btn-plus" onclick="toggleDropdown(event)">+</button>
+                <div id="dropdown-menu" class="dropdown-content">
+                    <a th:href="@{/cadastro-aluno}"> Adicionar Aluno</a>
+                    <a th:href="@{/cadastro-livro}"> Adicionar Livro</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Incluindo o fragmento do modal customizado -->
+        <div th:replace="~{fragments/modal :: modal}"></div>
+    </header>
+
+</body>
+</html>
