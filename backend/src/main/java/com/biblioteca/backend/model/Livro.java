@@ -113,4 +113,8 @@ public class Livro {
     public void marcarComoIndisponivel() {
         this.disponivel = false;
     }
+
+    public void marcarComoDisponivel() {
+        this.disponivel = true;
+    }
 }
