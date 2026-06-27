@@ -120,4 +120,29 @@ public class Emprestimo {
     public void setItens(List<ItemEmprestimo> itens) {
         this.itens = itens;
     }
+
+    public static Emprestimo novo(Aluno aluno) {
+        Emprestimo emprestimo = new Emprestimo();
+        emprestimo.aluno = aluno;
+        emprestimo.dataEmprestimo = LocalDate.now();
+        emprestimo.dataPrevista = emprestimo.dataEmprestimo;
+        emprestimo.multa = BigDecimal.ZERO;
+        emprestimo.valor = BigDecimal.ZERO;
+        emprestimo.atraso = false;
+        return emprestimo;
+    }
+
+    public void adicionarLivro(Livro livro) {
+        LocalDate dataPrevistaItem = livro.getTitulo().calcularDataPrevistaDevolucao(this.dataEmprestimo);
+        ItemEmprestimo item = criarItemEmprestimo(livro, dataPrevistaItem);
+        this.itens.add(item);
+        if (dataPrevistaItem.isAfter(this.dataPrevista)) {
+            this.dataPrevista = dataPrevistaItem;
+        }
+        livro.marcarComoIndisponivel();
+    }
+
+    private ItemEmprestimo criarItemEmprestimo(Livro livro, LocalDate dataPrevista) {
+        return new ItemEmprestimo(this, livro, dataPrevista);
+    }
 }

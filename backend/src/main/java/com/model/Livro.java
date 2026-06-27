@@ -86,4 +86,31 @@ public class Livro {
     public void setReservas(List<ReservaLivro> reservas) {
         this.reservas = reservas;
     }
+
+    public boolean podeSerEmprestado() {
+        return Boolean.TRUE.equals(disponivel)
+                && Boolean.TRUE.equals(exemplarBiblioteca)
+                && !possuiReservaAtiva();
+    }
+
+    public boolean possuiReservaAtiva() {
+        return reservas != null && !reservas.isEmpty();
+    }
+
+    public String getMotivoImpedimentoEmprestimo() {
+        if (!Boolean.TRUE.equals(disponivel)) {
+            return "Livro indisponível para empréstimo (id " + id + ")";
+        }
+        if (!Boolean.TRUE.equals(exemplarBiblioteca)) {
+            return "Exemplar não permitido para empréstimo (id " + id + ")";
+        }
+        if (possuiReservaAtiva()) {
+            return "Livro possui reserva ativa (id " + id + ")";
+        }
+        return "Livro não pode ser emprestado (id " + id + ")";
+    }
+
+    public void marcarComoIndisponivel() {
+        this.disponivel = false;
+    }
 }
