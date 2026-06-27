@@ -5,7 +5,7 @@ import com.biblioteca.backend.dto.AlunoResponse;
 import com.biblioteca.backend.exception.BusinessRuleException;
 import com.biblioteca.backend.exception.ResourceNotFoundException;
 import com.biblioteca.backend.repository.AlunoRepository;
-import com.model.Aluno;
+import com.biblioteca.backend.model.Aluno;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

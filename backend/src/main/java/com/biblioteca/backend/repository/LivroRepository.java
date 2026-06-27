@@ -1,6 +1,6 @@
 package com.biblioteca.backend.repository;
 
-import com.model.Livro;
+import com.biblioteca.backend.model.Livro;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

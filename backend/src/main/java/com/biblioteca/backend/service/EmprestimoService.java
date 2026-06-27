@@ -8,10 +8,10 @@ import com.biblioteca.backend.exception.ResourceNotFoundException;
 import com.biblioteca.backend.repository.AlunoRepository;
 import com.biblioteca.backend.repository.EmprestimoRepository;
 import com.biblioteca.backend.repository.LivroRepository;
-import com.model.Aluno;
-import com.model.Emprestimo;
-import com.model.ItemEmprestimo;
-import com.model.Livro;
+import com.biblioteca.backend.model.Aluno;
+import com.biblioteca.backend.model.Emprestimo;
+import com.biblioteca.backend.model.ItemEmprestimo;
+import com.biblioteca.backend.model.Livro;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

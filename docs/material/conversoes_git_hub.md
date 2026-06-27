@@ -95,3 +95,6 @@ O pipeline de Integração Contínua (CI) será configurado em `.github/workflow
 No intuito de realizar um entrega próxima a um ambiente real também iremos realizar o pipeline para deploy da aplicação.
 * A automação de CD estará localizada em `.github/workflows/deploy.yml` e será disparada após o merge na `main`.
 * Realizará o build e publicação da imagem Docker ou deploy direto no provedor de Cloud selecionado.
+
+Material de referência
+https://medium.com/linkapi-solutions/conventional-commits-pattern-3778d1a1e657

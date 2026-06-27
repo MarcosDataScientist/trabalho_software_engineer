@@ -1,5 +1,5 @@
 
-package com.model;
+package com.biblioteca.backend.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;

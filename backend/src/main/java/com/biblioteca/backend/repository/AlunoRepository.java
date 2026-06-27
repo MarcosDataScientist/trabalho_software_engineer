@@ -1,6 +1,6 @@
 package com.biblioteca.backend.repository;
 
-import com.model.Aluno;
+import com.biblioteca.backend.model.Aluno;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
