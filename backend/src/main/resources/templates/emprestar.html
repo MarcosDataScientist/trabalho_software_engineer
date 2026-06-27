@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empréstimo de Livros - Biblioteca</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container">
+        <div class="titulo">
+            <h2>Livros Disponíveis para Empréstimo</h2>
+            <button th:onclick="'location.href=\'' + @{/dashboard} + '\''">
+                Voltar
+            </button>
+        </div>
+
+        <div class="lista" id="lista-emprestimo">
+            
+            <div th:if="${!livrosDisponiveis.isEmpty()}">
+                <div th:each="livro : ${livrosDisponiveis}" class="livro" th:id="'livro-' + ${livro.id}">
+                    <div>
+                        <!-- livro é provável que seja LivroResponse contendo id, titulo, etc -->
+                        <h3 th:text="${livro.titulo}">Título do Livro</h3>
+                        <!-- Poderíamos colocar autor, mas vamos omitir para generalizar caso o DTO não tenha -->
+                        <p th:text="'Livro ID: ' + ${livro.id}"></p>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <span>Disponível</span>
+                        
+                        <form th:action="@{/api/emprestimos}" method="post" style="margin: 0;">
+                            <!-- Na API real seria necessário passar o JSON com EmprestimoRequest, mas aqui mantemos o front mock com JS -->
+                            <button type="button" style="padding: 8px 16px; font-size: 14px;"
+                                th:onclick="emprestarLivro([[${livro.id}]], [[${livro.titulo}]], [[${aluno.matricula}]])">
+                                Emprestar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Caso não haja livros disponíveis -->
+            <div th:if="${livrosDisponiveis.isEmpty()}" class="livro">
+                <div style="text-align: center; width: 100%;">
+                    <h3 style="color: var(--text-secondary);">Nenhum livro disponível</h3>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="mensagem-vazia" style="display: none; text-align: center; margin-top: 40px; padding: 40px; background: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-color);">
+            <h3 style="color: var(--text-secondary); margin-bottom: 8px;">Todos os livros foram emprestados!</h3>
+            <p style="color: var(--text-muted);">Não há mais livros disponíveis no momento.</p>
+        </div>
+
+    </main>
+
+    <script th:src="@{/js/script.js}"></script>
+</body>
+</html>
