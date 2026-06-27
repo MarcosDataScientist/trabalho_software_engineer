@@ -2,6 +2,7 @@ package com.biblioteca.backend.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public record EmprestimoResponse(
         Long id,
@@ -12,6 +13,7 @@ public record EmprestimoResponse(
         BigDecimal valor,
         Boolean atraso,
         Long matriculaAluno,
-        String nomeAluno
+        String nomeAluno,
+        List<ItemEmprestimoResponse> livrosEmprestados
 ) {
 }

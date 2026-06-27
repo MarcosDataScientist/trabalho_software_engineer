@@ -1,7 +1,7 @@
-
 package com.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,5 +119,9 @@ public class Titulo {
 
     public void setAutores(List<TituloAutor> autores) {
         this.autores = autores;
+    }
+
+    public LocalDate calcularDataPrevistaDevolucao(LocalDate dataEmprestimo) {
+        return dataEmprestimo.plusDays(this.prazo);
     }
 }

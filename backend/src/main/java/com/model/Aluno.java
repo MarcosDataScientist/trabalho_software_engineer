@@ -94,4 +94,8 @@ public class Aluno {
     public void setDebitos(List<Debito> debitos) {
         this.debitos = debitos;
     }
+
+    public boolean possuiPendenciasFinanceiras() {
+        return debitos != null && !debitos.isEmpty();
+    }
 }

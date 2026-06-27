@@ -2,10 +2,16 @@ package com.biblioteca.backend.repository;
 
 import com.model.Livro;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LivroRepository extends JpaRepository<Livro, Long> {
 
     List<Livro> findByDisponivelTrue();
+
+    @Query("SELECT l FROM Livro l JOIN FETCH l.titulo LEFT JOIN FETCH l.reservas WHERE l.id = :id")
+    Optional<Livro> findByIdParaEmprestimo(@Param("id") Long id);
 }
