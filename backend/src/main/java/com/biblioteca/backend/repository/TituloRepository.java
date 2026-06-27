@@ -1,6 +1,6 @@
 package com.biblioteca.backend.repository;
 
-import com.model.Titulo;
+import com.biblioteca.backend.model.Titulo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
