@@ -2,7 +2,9 @@
 package com.biblioteca.backend.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table(name = "item_emprestimo")
@@ -74,5 +76,30 @@ public class ItemEmprestimo {
 
     public void setDataDevolucao(LocalDate dataDevolucao) {
         this.dataDevolucao = dataDevolucao;
+    }
+
+    public boolean foiDevolvido() {
+        return dataDevolucao != null;
+    }
+
+    public long calcularDiasAtraso(LocalDate dataDevolucao) {
+        if (dataDevolucao.isAfter(dataPrevista)) {
+            return ChronoUnit.DAYS.between(dataPrevista, dataDevolucao);
+        }
+        return 0;
+    }
+
+    public BigDecimal calcularMulta(LocalDate dataDevolucao, BigDecimal taxaDiaria) {
+        long diasAtraso = calcularDiasAtraso(dataDevolucao);
+        if (diasAtraso <= 0) {
+            return BigDecimal.ZERO;
+        }
+        return taxaDiaria.multiply(BigDecimal.valueOf(diasAtraso));
+    }
+
+    public BigDecimal devolver(LocalDate dataDevolucao, BigDecimal taxaDiaria) {
+        this.dataDevolucao = dataDevolucao;
+        livro.marcarComoDisponivel();
+        return calcularMulta(dataDevolucao, taxaDiaria);
     }
 }

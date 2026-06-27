@@ -1,5 +1,7 @@
 package com.biblioteca.backend.controller;
 
+import com.biblioteca.backend.dto.DevolucaoRequest;
+import com.biblioteca.backend.dto.DevolucaoResponse;
 import com.biblioteca.backend.dto.EmprestimoRequest;
 import com.biblioteca.backend.dto.EmprestimoResponse;
 import com.biblioteca.backend.service.EmprestimoService;
@@ -33,5 +35,10 @@ public class EmprestimoController {
     @ResponseStatus(HttpStatus.CREATED)
     public EmprestimoResponse emprestar(@Valid @RequestBody EmprestimoRequest request) {
         return emprestimoService.emprestar(request);
+    }
+
+    @PostMapping("/devolver")
+    public DevolucaoResponse devolver(@Valid @RequestBody DevolucaoRequest request) {
+        return emprestimoService.devolver(request);
     }
 }

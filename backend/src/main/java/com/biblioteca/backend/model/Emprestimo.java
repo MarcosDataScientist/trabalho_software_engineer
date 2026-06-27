@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "emprestimo")
@@ -144,5 +145,49 @@ public class Emprestimo {
 
     private ItemEmprestimo criarItemEmprestimo(Livro livro, LocalDate dataPrevista) {
         return new ItemEmprestimo(this, livro, dataPrevista);
+    }
+
+    public boolean possuiItensPassiveisDeDevolucao() {
+        return itens.stream().anyMatch(item -> !item.foiDevolvido());
+    }
+
+    public Optional<ItemEmprestimo> buscarItemPorLivro(Long livroId) {
+        return itens.stream()
+                .filter(item -> item.getLivro().getId().equals(livroId))
+                .findFirst();
+    }
+
+    public boolean todosItensDevolvidos() {
+        return !itens.isEmpty() && itens.stream().allMatch(ItemEmprestimo::foiDevolvido);
+    }
+
+    public ResultadoDevolucao registrarDevolucaoDeItens(
+            List<Long> livrosIds,
+            LocalDate dataDevolucao,
+            BigDecimal taxaDiaria
+    ) {
+        BigDecimal multaGerada = BigDecimal.ZERO;
+        boolean houveAtraso = false;
+
+        for (Long livroId : livrosIds) {
+            ItemEmprestimo item = buscarItemPorLivro(livroId).orElseThrow();
+            if (item.calcularDiasAtraso(dataDevolucao) > 0) {
+                houveAtraso = true;
+            }
+            multaGerada = multaGerada.add(item.devolver(dataDevolucao, taxaDiaria));
+        }
+
+        this.multa = this.multa.add(multaGerada);
+        if (houveAtraso) {
+            this.atraso = true;
+        }
+        if (todosItensDevolvidos()) {
+            this.dataDevolucao = dataDevolucao;
+        }
+
+        return new ResultadoDevolucao(multaGerada, houveAtraso);
+    }
+
+    public record ResultadoDevolucao(BigDecimal multaGerada, boolean houveAtraso) {
     }
 }
