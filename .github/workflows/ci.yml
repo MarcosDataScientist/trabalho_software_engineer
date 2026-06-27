@@ -1,0 +1,71 @@
+name: Continuous Integration (CI)
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
+  push:
+    branches: [ main ]
+
+jobs:
+  test-and-build:
+    name: Executar Testes e Compilar Backend
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: db_biblioteca
+          POSTGRES_USER: trabalho_menolli
+          POSTGRES_PASSWORD: senha_menolli
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 25 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Dar permissão de execução ao Gradle Wrapper
+        run: chmod +x gradlew
+
+      - name: Executar Testes Unitários e de Integração
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: db_biblioteca
+          DB_USER: trabalho_menolli
+          DB_PASS: senha_menolli
+        run: ./gradlew test --no-daemon
+
+      - name: Compilar o Projeto (Build)
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: db_biblioteca
+          DB_USER: trabalho_menolli
+          DB_PASS: senha_menolli
+        run: ./gradlew assemble --no-daemon
+
+      - name: Salvar Relatório de Testes (em caso de falha)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-testes-gradle
+          path: backend/build/reports/tests/test/
