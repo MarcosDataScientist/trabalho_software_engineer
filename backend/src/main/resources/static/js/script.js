@@ -141,21 +141,79 @@ async function salvarAluno() {
     }
 }
 
-// Book registration (Mock fallback)
+// Book registration (API call)
 async function salvarLivro() {
     const codigo = document.getElementById('codigo').value;
     const titulo = document.getElementById('titulo').value.trim();
-    const autor = document.getElementById('autor').value.trim();
+    const autorNomeCompleto = document.getElementById('autor').value.trim();
     const prazo = document.getElementById('prazo').value;
     
-    if (!codigo || !titulo || !autor || !prazo) {
+    if (!codigo || !titulo || !autorNomeCompleto || !prazo) {
         await mostrarMensagem("Aviso", "Preencha todos os campos.");
         return;
     }
 
-    await mostrarMensagem("Sucesso", `Livro Cadastrado com Sucesso!\n\nTítulo: ${titulo}\nAutor: ${autor}\nCódigo: ${codigo}\nPrazo de devolução: ${prazo} dias\n\nO item foi adicionado ao catálogo.`);
-    document.getElementById('form-livro').reset();
-    location.href = '/dashboard';
+    try {
+        let areaId = 1;
+        const areasRes = await fetch('/api/livros/catalogo/areas');
+        if (areasRes.ok) {
+            const areas = await areasRes.json();
+            if (areas.length > 0) {
+                areaId = areas[0].id;
+            } else {
+                const newAreaRes = await fetch('/api/livros/catalogo/areas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome: "Geral", descricao: "Área geral do catálogo" })
+                });
+                if (newAreaRes.ok) {
+                    const newArea = await newAreaRes.json();
+                    areaId = newArea.id;
+                }
+            }
+        }
+
+        let autorId = 1;
+        const nomes = autorNomeCompleto.split(' ');
+        const nome = nomes[0];
+        const sobrenome = nomes.length > 1 ? nomes.slice(1).join(' ') : "";
+        
+        const autorRes = await fetch('/api/livros/catalogo/autores', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome: nome, sobrenome: sobrenome, titulacao: "Autor(a)" })
+        });
+        if (autorRes.ok) {
+            const autor = await autorRes.json();
+            autorId = autor.id;
+        }
+
+        const livroRes = await fetch('/api/livros', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                titulo: titulo,
+                prazo: parseInt(prazo, 10),
+                isbn: codigo,
+                areaId: areaId,
+                autorIds: [autorId],
+                disponivel: true,
+                exemplarBiblioteca: true
+            })
+        });
+
+        if (livroRes.ok) {
+            await mostrarMensagem("Sucesso", `Livro Cadastrado com Sucesso!\n\nTítulo: ${titulo}\nAutor: ${autorNomeCompleto}\nCódigo: ${codigo}\nPrazo de devolução: ${prazo} dias\n\nO item foi adicionado ao catálogo e salvo no banco de dados.`);
+            document.getElementById('form-livro').reset();
+            location.href = '/dashboard';
+        } else {
+            const errData = await livroRes.json();
+            await mostrarMensagem("Erro", `Erro ao cadastrar livro: ${errData.message || livroRes.statusText}`);
+        }
+    } catch (error) {
+        console.error(error);
+        await mostrarMensagem("Erro de Conexão", "Erro de conexão ao tentar cadastrar o livro no banco de dados.");
+    }
 }
 
 // Book lending API call
