@@ -1,45 +1,52 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
 </head>
+
 <body>
 
     <header class="topo" th:fragment="header">
         <h1>Biblioteca</h1>
 
-        <div class="perfil">
-            <!-- Nome do Usuário com Dropdown -->
-            <div class="menu-header" th:if="${isLoginPage == null or !isLoginPage}">
-                <div style="cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 10px 0;"
-                    onclick="toggleUserDropdown(event)">
-                    <strong id="username-display" th:text="${aluno != null ? aluno.nome : 'Visitante'}">Michel</strong>
-                    <span style="font-size: 10px; color: var(--text-secondary); transition: transform 0.2s;"
-                        id="user-arrow">▼</span>
+
+        <div class="perfil" style="display: flex; gap: 24px;">
+            <!-- Dropdown Aluno -->
+            <div class="menu-header" style="position: relative;">
+                <div class="btn-nav"
+                    onclick="event.stopPropagation(); fecharOutrosDropdowns('aluno-dropdown-menu'); document.getElementById('aluno-dropdown-menu').classList.toggle('show');">
+                    Alunos
+                    <span>▼</span>
                 </div>
-                <div id="user-dropdown-menu" class="dropdown-content" style="right: auto; left: 0;">
-                    <a th:href="@{/perfil}" th:if="${aluno != null}"> Ver Perfil</a>
-                    <a th:href="@{/login}"> Trocar Usuário / Entrar</a>
+                <div id="aluno-dropdown-menu" class="dropdown-content dropdown-nav"
+                    style="right: auto; left: 0; min-width: 150px; margin-top: 8px;">
+                    <a th:href="@{/cadastro-aluno}">Adicionar Aluno</a>
+                    <a th:href="@{/emprestar}">Empréstimos</a>
+                    <a th:href="@{/devolver}">Devoluções</a>
                 </div>
             </div>
 
-            <div class="creditos" id="display-creditos" th:if="${aluno != null}">
-                <span th:text="${aluno.possuiPendenciasFinanceiras() ? 'Possui Débitos' : 'Sem Débitos'}">Status</span>
-            </div>
-
-            <!-- Botão de Ações Rápidas (+) com Dropdown -->
-            <div class="menu-header">
-                <button class="btn-plus" onclick="toggleDropdown(event)">+</button>
-                <div id="dropdown-menu" class="dropdown-content">
-                    <a th:href="@{/cadastro-aluno}"> Adicionar Aluno</a>
-                    <a th:href="@{/cadastro-livro}"> Adicionar Livro</a>
+            <!-- Dropdown Livros -->
+            <div class="menu-header" style="position: relative;">
+                <div class="btn-nav"
+                    onclick="event.stopPropagation(); fecharOutrosDropdowns('livro-dropdown-menu'); document.getElementById('livro-dropdown-menu').classList.toggle('show');">
+                    Livros
+                    <span>▼</span>
+                </div>
+                <div id="livro-dropdown-menu" class="dropdown-content dropdown-nav"
+                    style="right: auto; left: 0; min-width: 150px; margin-top: 8px;">
+                    <a th:href="@{/cadastro-livro}">Adicionar Livro</a>
+                    <a th:href="@{/unidades}">Unidades</a>
                 </div>
             </div>
         </div>
+
 
         <!-- Incluindo o fragmento do modal customizado -->
         <div th:replace="~{fragments/modal :: modal}"></div>
     </header>
 
 </body>
+
 </html>

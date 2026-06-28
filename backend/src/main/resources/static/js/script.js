@@ -311,3 +311,103 @@ async function devolverLivro(emprestimoId, matricula, livroId) {
         await mostrarMensagem("Erro de Conexão", "Erro de conexão ao tentar devolver o livro.");
     }
 }
+
+// Fechar outros dropdowns ao abrir um novo (header nav)
+function fecharOutrosDropdowns(excecaoId) {
+    const dropdowns = document.getElementsByClassName("dropdown-content");
+    for (let i = 0; i < dropdowns.length; i++) {
+        if (dropdowns[i].id !== excecaoId) {
+            dropdowns[i].classList.remove('show');
+        }
+    }
+}
+
+// Realizar emprestimo (formulario novo)
+async function realizarEmprestimo() {
+    const alunoSelect = document.getElementById('aluno-select');
+    const livroSelect = document.getElementById('livro-select');
+    
+    if (!alunoSelect.value || !livroSelect.value) {
+        await mostrarMensagem("Aviso", "Selecione o aluno e o livro.");
+        return;
+    }
+
+    const matricula = alunoSelect.value;
+    const livroId = livroSelect.value;
+
+    try {
+        const response = await fetch('/api/emprestimos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                matricula: parseInt(matricula, 10),
+                livrosIds: [parseInt(livroId, 10)]
+            })
+        });
+
+        if (response.ok) {
+            await mostrarMensagem("Empréstimo Realizado", `O empréstimo foi realizado com sucesso!`);
+            location.href = '/dashboard';
+        } else {
+            const errData = await response.json();
+            await mostrarMensagem("Erro", `Erro ao realizar empréstimo: ${errData.message || response.statusText}`);
+        }
+    } catch (error) {
+        console.error(error);
+        await mostrarMensagem("Erro de Conexão", "Erro de conexão ao tentar realizar o empréstimo.");
+    }
+}
+
+// Devolver todos os livros de um empréstimo (Formato novo para bibliotecário)
+async function devolverEmprestimo(emprestimoId, matricula, livrosIdsStr) {
+    if (!emprestimoId || !matricula || !livrosIdsStr) return;
+    
+    // Converte a string de IDs em um array de inteiros
+    const livrosIds = livrosIdsStr.split(',').map(id => parseInt(id.trim(), 10)).filter(id => !isNaN(id));
+
+    try {
+        const response = await fetch('/api/emprestimos/devolver', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                emprestimoId: parseInt(emprestimoId, 10),
+                matricula: parseInt(matricula, 10),
+                livrosIds: livrosIds
+            })
+        });
+
+        if (response.ok) {
+            const card = document.getElementById(`emprestimo-${emprestimoId}`);
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(10px)';
+                card.style.transition = 'all 0.5s ease';
+
+                setTimeout(async () => {
+                    card.remove();
+                    await mostrarMensagem("Devolução Concluída", "Empréstimo devolvido com sucesso!");
+                    
+                    const lista = document.getElementById('lista-devolucoes');
+                    const emprestimosRestantes = lista ? lista.getElementsByClassName('livro') : [];
+                    if (emprestimosRestantes.length === 0) {
+                        const msgVazia = document.getElementById('mensagem-vazia');
+                        if (msgVazia) msgVazia.style.display = 'block';
+                    }
+                }, 500);
+            } else {
+                await mostrarMensagem("Devolução Concluída", "Empréstimo devolvido com sucesso!");
+                location.reload();
+            }
+        } else {
+            const errData = await response.json();
+            await mostrarMensagem("Erro", `Erro ao realizar devolução: ${errData.message || response.statusText}`);
+        }
+    } catch (error) {
+        console.error(error);
+        await mostrarMensagem("Erro de Conexão", "Erro de conexão ao tentar realizar a devolução.");
+    }
+}

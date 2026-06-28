@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unidades - Biblioteca</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container">
+        <div class="titulo">
+            <h2>Estoque de Livros (Unidades)</h2>
+            <button th:onclick="'location.href=\'' + @{/dashboard} + '\''">
+                Voltar
+            </button>
+        </div>
+
+        <div class="lista">
+            
+            <div th:if="${unidades != null and !unidades.isEmpty()}">
+                <div th:each="unidade : ${unidades}" class="livro">
+                    <div>
+                        <h3 th:text="${unidade.titulo}"></h3>
+                        <p class="info-text">
+                            <strong>ISBN:</strong> <span th:text="${unidade.isbn}"></span>
+                        </p>
+                    </div>
+
+                    <div class="action-container" style="gap: 24px;">
+                        <div style="text-align: center;">
+                            <span style="font-size: 24px; font-weight: bold; color: var(--text-primary);" th:text="${unidade.quantidadeTotal}"></span>
+                            <p class="muted-text" style="margin: 0; font-size: 12px;">Total</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <span style="font-size: 24px; font-weight: bold; color: var(--accent-color);" th:text="${unidade.quantidadeDisponivel}"></span>
+                            <p class="muted-text" style="margin: 0; font-size: 12px;">Disponíveis</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${unidades == null or unidades.isEmpty()}" class="empty-state-card">
+                <h3 class="empty-state-title">Nenhuma unidade encontrada</h3>
+                <p class="muted-text">A biblioteca ainda não possui livros cadastrados.</p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script th:src="@{/js/script.js}"></script>
+</body>
+</html>
