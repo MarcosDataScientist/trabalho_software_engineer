@@ -12,50 +12,39 @@
 
     <main class="container">
         <div class="titulo">
-            <h2>Livros Disponíveis para Empréstimo</h2>
+            <h2>Realizar Empréstimo</h2>
             <button th:onclick="'location.href=\'' + @{/dashboard} + '\''">
                 Voltar
             </button>
         </div>
 
-        <div class="lista" id="lista-emprestimo">
-            
-            <div th:if="${!livrosDisponiveis.isEmpty()}">
-                <div th:each="livro : ${livrosDisponiveis}" class="livro" th:id="'livro-' + ${livro.id}">
-                    <div>
-                        <!-- livro é provável que seja LivroResponse contendo id, titulo, etc -->
-                        <h3 th:text="${livro.titulo}">Título do Livro</h3>
-                        <!-- Poderíamos colocar autor, mas vamos omitir para generalizar caso o DTO não tenha -->
-                        <p th:text="'Livro ID: ' + ${livro.id}"></p>
-                    </div>
-
-                    <div style="display: flex; align-items: center; gap: 16px;">
-                        <span>Disponível</span>
-                        
-                        <form th:action="@{/api/emprestimos}" method="post" style="margin: 0;">
-                            <!-- Na API real seria necessário passar o JSON com EmprestimoRequest, mas aqui mantemos o front mock com JS -->
-                            <button type="button" style="padding: 8px 16px; font-size: 14px;"
-                                th:onclick="emprestarLivro([[${livro.id}]], [[${livro.titulo}]], [[${aluno.matricula}]])">
-                                Emprestar
-                            </button>
-                        </form>
-                    </div>
-                </div>
+        <form class="form-container" id="form-emprestimo" onsubmit="event.preventDefault(); realizarEmprestimo();">
+            <div class="form-group">
+                <label for="aluno-select">Selecionar Aluno</label>
+                <select id="aluno-select" name="matricula" required>
+                    <option value="" disabled selected>Selecione um aluno...</option>
+                    <option th:each="alunoItem : ${alunos}" 
+                            th:value="${alunoItem.matricula}" 
+                            th:text="${alunoItem.nome} + ' (RA: ' + ${alunoItem.matricula} + ')'">
+                    </option>
+                </select>
             </div>
 
-            <!-- Caso não haja livros disponíveis -->
-            <div th:if="${livrosDisponiveis.isEmpty()}" class="livro">
-                <div style="text-align: center; width: 100%;">
-                    <h3 style="color: var(--text-secondary);">Nenhum livro disponível</h3>
-                </div>
+            <div class="form-group">
+                <label for="livro-select">Selecionar Livro</label>
+                <select id="livro-select" name="livroId" required>
+                    <option value="" disabled selected>Selecione um livro disponível...</option>
+                    <option th:each="livro : ${livrosDisponiveis}" 
+                            th:value="${livro.id}" 
+                            th:text="${livro.titulo} + ' (ISBN: ' + ${livro.isbn} + ')'">
+                    </option>
+                </select>
             </div>
 
-        </div>
-
-        <div id="mensagem-vazia" style="display: none; text-align: center; margin-top: 40px; padding: 40px; background: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-color);">
-            <h3 style="color: var(--text-secondary); margin-bottom: 8px;">Todos os livros foram emprestados!</h3>
-            <p style="color: var(--text-muted);">Não há mais livros disponíveis no momento.</p>
-        </div>
+            <div class="form-actions">
+                <button type="submit">Confirmar Empréstimo</button>
+            </div>
+        </form>
 
     </main>
 

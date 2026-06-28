@@ -13,55 +13,47 @@
 
     <main class="container">
         <div class="titulo">
-            <h2>Meus Livros</h2>
-            <div style="display: flex; gap: 12px;">
-                <button th:onclick="'location.href=\'' + @{/emprestar} + '\''">
-                    Emprestar Novo Livro
-                </button>
-            </div>
+            <h2>Catálogo de Livros</h2>
         </div>
 
         <div class="lista" id="lista-livros">
             
-            <!-- Iterando sobre empréstimos do aluno -->
-            <div th:if="${aluno != null and !aluno.emprestimos.isEmpty()}">
-                <div th:each="emprestimo : ${aluno.emprestimos}" th:if="${emprestimo.dataDevolucao == null}" class="livro" th:id="'livro-' + ${emprestimo.id}">
+            <!-- Iterando sobre todos os livros cadastrados -->
+            <div th:if="${livros != null and !livros.isEmpty()}">
+                <div th:each="livro : ${livros}" class="livro" th:id="'livro-' + ${livro.id}">
                     <div>
-                        <!-- Assumindo que ItemEmprestimo contém Livro, e Livro contém Titulo. Pegando o primeiro item para simplificar -->
-                        <h3 th:text="${!emprestimo.itens.isEmpty() ? emprestimo.itens[0].livro.titulo.titulo : 'Livro'}">Título</h3>
-                        <p th:text="'Data de Devolução: ' + ${#temporals.format(emprestimo.dataPrevista, 'dd/MM/yyyy')}">Autor</p>
+                        <h3 th:text="${livro.titulo}">Título</h3>
+                        <p style="color: var(--text-secondary); margin: 4px 0;">
+                            <strong>Autores:</strong> 
+                            <span th:each="autor, iterStat : ${livro.autores}" 
+                                  th:text="${autor.nome} + ' ' + ${autor.sobrenome} + ${!iterStat.last ? ', ' : ''}">
+                            </span>
+                        </p>
+                        <p style="font-size: 14px; color: var(--text-muted);">
+                            <span th:text="'ISBN: ' + ${livro.isbn}"></span> | 
+                            <span th:text="'Edição: ' + ${livro.edicao}"></span> | 
+                            <span th:text="'Ano: ' + ${livro.ano}"></span>
+                        </p>
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 16px;">
-                        <!-- Verificação de atraso fictícia -->
-                        <span th:if="${emprestimo.dataDevolucao == null}" style="background: rgba(59, 130, 246, 0.1); color: var(--accent-color);">
-                            Em Aberto
+                        <span th:if="${livro.disponivel}" style="background: rgba(34, 197, 94, 0.1); color: var(--success-color, #22c55e); padding: 6px 12px; border-radius: 6px; font-size: 14px; font-weight: bold;">
+                            Disponível
                         </span>
-                        
-                        <form th:action="@{/api/emprestimos/devolver}" method="post" style="margin: 0;">
-                            <!-- Seria necessário mapear id do aluno e dos itens, usaremos JS para manter o mock por enquanto -->
-                            <button type="button" style="padding: 8px 16px; font-size: 14px;"
-                                th:onclick="devolverLivro([[${emprestimo.id}]], [[${aluno.matricula}]], [[${!emprestimo.itens.isEmpty() ? emprestimo.itens[0].livro.id : 0}]])">
-                                Devolver
-                            </button>
-                        </form>
+                        <span th:if="${!livro.disponivel}" style="background: rgba(239, 68, 68, 0.1); color: var(--danger-color, #ef4444); padding: 6px 12px; border-radius: 6px; font-size: 14px; font-weight: bold;">
+                            Indisponível
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <!-- Caso não haja aluno logado ou não tenha empréstimos (Oculto via thymeleaf, mas deixamos o layout mockado tbm caso null) -->
-            <div th:if="${aluno == null or aluno.emprestimos.isEmpty()}" class="livro">
+            <!-- Caso não haja livros cadastrados -->
+            <div th:if="${livros == null or livros.isEmpty()}" class="livro">
                 <div style="text-align: center; width: 100%;">
-                    <h3 style="color: var(--text-secondary);">Nenhum empréstimo ativo</h3>
+                    <h3 style="color: var(--text-secondary);">Nenhum livro cadastrado no sistema</h3>
                 </div>
             </div>
             
-        </div>
-        
-        <div id="mensagem-vazia"
-             style="display: none; text-align: center; margin-top: 40px; padding: 40px; background: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border-color);">
-            <h3 style="color: var(--text-secondary); margin-bottom: 8px;">Nenhum livro alugado</h3>
-            <p style="color: var(--text-muted);">Você não possui nenhum empréstimo ativo no momento.</p>
         </div>
 
     </main>

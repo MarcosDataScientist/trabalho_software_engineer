@@ -2,6 +2,7 @@ package com.biblioteca.backend.controller;
 
 import com.biblioteca.backend.model.Aluno;
 import com.biblioteca.backend.repository.AlunoRepository;
+import com.biblioteca.backend.service.EmprestimoService;
 import com.biblioteca.backend.service.LivroService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -16,16 +17,17 @@ public class ViewController {
 
     private final AlunoRepository alunoRepository;
     private final LivroService livroService;
+    private final EmprestimoService emprestimoService;
 
-    public ViewController(AlunoRepository alunoRepository, LivroService livroService) {
+    public ViewController(AlunoRepository alunoRepository, LivroService livroService, EmprestimoService emprestimoService) {
         this.alunoRepository = alunoRepository;
         this.livroService = livroService;
+        this.emprestimoService = emprestimoService;
     }
 
     @GetMapping("/")
     public String index(Model model) {
-        model.addAttribute("isLoginPage", true);
-        return "logar-aluno";
+        return "redirect:/dashboard";
     }
 
     @GetMapping("/login")
@@ -49,22 +51,52 @@ public class ViewController {
     @GetMapping("/dashboard")
     public String dashboard(Model model, HttpSession session) {
         var aluno = getLoggedAluno(session);
-        if (aluno == null) {
-            return "redirect:/login";
-        }
         model.addAttribute("aluno", aluno);
+        model.addAttribute("livros", livroService.listarTodos());
         return "index";
     }
 
     @GetMapping("/emprestar")
     public String emprestar(Model model, HttpSession session) {
         var aluno = getLoggedAluno(session);
-        if (aluno == null) {
-            return "redirect:/login";
-        }
         model.addAttribute("aluno", aluno);
+        model.addAttribute("alunos", alunoRepository.findAll());
         model.addAttribute("livrosDisponiveis", livroService.listarDisponiveis());
         return "emprestar";
+    }
+
+    @GetMapping("/devolver")
+    public String devolver(Model model, HttpSession session) {
+        var aluno = getLoggedAluno(session);
+        model.addAttribute("aluno", aluno);
+        model.addAttribute("emprestimos", emprestimoService.listarTodos());
+        return "devolver";
+    }
+
+    public record LivroAgrupado(String titulo, String isbn, long quantidadeTotal, long quantidadeDisponivel) {}
+
+    @GetMapping("/unidades")
+    public String unidades(Model model, HttpSession session) {
+        var aluno = getLoggedAluno(session);
+        model.addAttribute("aluno", aluno);
+        
+        java.util.List<com.biblioteca.backend.dto.LivroResponse> todos = livroService.listarTodos();
+        java.util.Map<String, LivroAgrupado> agrupado = new java.util.HashMap<>();
+        
+        for (com.biblioteca.backend.dto.LivroResponse l : todos) {
+            String key = l.tituloId() + "-" + l.titulo();
+            agrupado.putIfAbsent(key, new LivroAgrupado(l.titulo(), l.isbn(), 0, 0));
+            var current = agrupado.get(key);
+            agrupado.put(key, new LivroAgrupado(
+                current.titulo(),
+                current.isbn(),
+                current.quantidadeTotal() + 1,
+                current.quantidadeDisponivel() + (l.disponivel() != null && l.disponivel() ? 1 : 0)
+            ));
+        }
+        
+        model.addAttribute("unidades", agrupado.values());
+        return "unidades";
     }
 
     @GetMapping("/cadastro-aluno")

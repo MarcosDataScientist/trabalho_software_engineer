@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devolução de Livros - Biblioteca</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="container">
+        <div class="titulo">
+            <h2>Empréstimos Ativos</h2>
+            <button th:onclick="'location.href=\'' + @{/dashboard} + '\''">
+                Voltar
+            </button>
+        </div>
+
+        <div class="lista" id="lista-devolucoes">
+            
+            <div th:if="${emprestimos != null and !emprestimos.isEmpty()}">
+                <!-- Mostraremos apenas empréstimos em aberto -->
+                <div th:each="emprestimo : ${emprestimos}" th:if="${emprestimo.dataDevolucao == null}" class="livro" th:id="'emprestimo-' + ${emprestimo.id}">
+                    <div>
+                        <h3 th:text="'Empréstimo #' + ${emprestimo.id} + ' - ' + ${emprestimo.nomeAluno} + ' (RA: ' + ${emprestimo.matriculaAluno} + ')'"></h3>
+                        <p class="info-text">
+                            <strong>Data Empréstimo:</strong> <span th:text="${emprestimo.dataEmprestimo}"></span> | 
+                            <strong>Data Prevista:</strong> <span th:text="${emprestimo.dataPrevista}"></span>
+                        </p>
+                        <p class="muted-text">
+                            <strong>Livros:</strong>
+                            <th:block th:each="item, iterStat : ${emprestimo.livrosEmprestados}">
+                                <span th:text="${item.tituloLivro}"></span><span th:if="${!iterStat.last}">, </span>
+                            </th:block>
+                        </p>
+                    </div>
+
+                    <div class="action-container">
+                        <span th:if="${emprestimo.atraso != null and emprestimo.atraso}" class="badge-danger">Em Atraso</span>
+                        <span th:if="${emprestimo.atraso == null or !emprestimo.atraso}" class="badge-primary">Em Aberto</span>
+                        
+                        <button type="button" class="btn-small"
+                            th:data-livro-ids="${#strings.listJoin(emprestimo.livrosEmprestados.![idLivro], ',')}"
+                            th:onclick="devolverEmprestimo([[${emprestimo.id}]], [[${emprestimo.matriculaAluno}]], this.getAttribute('data-livro-ids'))">
+                            Devolver Tudo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Caso não haja empréstimos ativos -->
+            <div th:if="${emprestimos == null or emprestimos.isEmpty()}" class="livro">
+                <div class="empty-state-container">
+                    <h3 class="empty-state-title">Nenhum empréstimo ativo</h3>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="mensagem-vazia" class="empty-state-card" style="display: none;">
+            <h3>Todos os empréstimos foram devolvidos!</h3>
+        </div>
+
+    </main>
+
+    <script th:src="@{/js/script.js}"></script>
+</body>
+</html>
